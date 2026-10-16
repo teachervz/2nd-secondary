@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة تحكم المعلمة — التقنية الرقمية ٢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html">
+        <span class="logo">⚙️</span>
+        <span>لوحة تحكم المعلمة<small>جميع البيانات تُحفظ تلقائيًا في هذا المتصفح</small></span>
+      </a>
+      <a class="btn" href="index.html">🏠 مكتبة الدروس</a>
+    </header>
+
+    <div class="dash-layout">
+      <!-- قائمة الأقسام -->
+      <nav class="dash-nav" id="dashNav">
+        <button type="button" data-tab="teacher" class="active">👩‍🏫 بيانات المعلمة</button>
+        <button type="button" data-tab="classes">🏫 الفصول والطالبات</button>
+        <button type="button" data-tab="lessons">✔️ متابعة الدروس</button>
+        <button type="button" data-tab="stats">📊 الإحصائيات</button>
+        <button type="button" data-tab="backup">💾 التصدير والنسخ</button>
+      </nav>
+
+      <div>
+        <!-- ١) بيانات المعلمة -->
+        <section class="tab-section active" id="tab-teacher">
+          <div class="panel">
+            <h2>👩‍🏫 بيانات المعلمة</h2>
+            <p class="sub">تظهر هذه البيانات في الصفحة الرئيسية وفي الشريحة الترحيبية لكل درس.</p>
+            <div class="form-grid" id="teacherForm">
+              <div class="field"><label for="t_name">اسم المعلمة</label><input class="input" id="t_name" data-k="name" placeholder="مثال: نورة العتيبي"></div>
+              <div class="field"><label for="t_school">اسم المدرسة</label><input class="input" id="t_school" data-k="school" placeholder="مثال: الثانوية الأولى"></div>
+              <div class="field"><label for="t_subject">المادة</label><input class="input" id="t_subject" data-k="subject"></div>
+              <div class="field"><label for="t_grade">الصف</label><input class="input" id="t_grade" data-k="grade"></div>
+              <div class="field"><label for="t_term">الفصل الدراسي</label><input class="input" id="t_term" data-k="term" placeholder="مثال: الفصل الدراسي الأول"></div>
+              <div class="field"><label for="t_year">العام الدراسي</label><input class="input" id="t_year" data-k="year"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ٢) الفصول والطالبات -->
+        <section class="tab-section" id="tab-classes">
+          <div class="panel">
+            <h2>🏫 إدارة الفصول</h2>
+            <p class="sub">أضيفي فصولك، واضغطي على أي فصل لإدارة طالباته.</p>
+            <form class="row" id="addClassForm">
+              <div class="field"><label for="newClass">اسم الفصل الجديد</label><input class="input" id="newClass" placeholder="مثال: ٢/١ أو ثاني ثانوي أ" required></div>
+              <button class="btn" type="submit">＋ إضافة فصل</button>
+            </form>
+            <div class="class-list" id="classList"></div>
+          </div>
+
+          <div class="panel" id="studentsPanel">
+            <h2 id="studentsTitle">👩‍🎓 الطالبات</h2>
+            <p class="sub">أضيفي طالبة واحدة، أو الصقي قائمة أسماء (كل اسم في سطر). يمكنك تعديل أي خانة مباشرة.</p>
+            <div id="studentsBody"></div>
+          </div>
+        </section>
+
+        <!-- ٣) متابعة الدروس -->
+        <section class="tab-section" id="tab-lessons">
+          <div class="panel">
+            <h2>✔️ تسجيل الدروس المنجزة</h2>
+            <p class="sub">سجّلي الدرس الذي تم شرحه لكل فصل مع التاريخ. يمكن التسجيل أيضًا من الشريحة الختامية في العرض.</p>
+            <form class="row" id="doneForm">
+              <div class="field"><label for="doneClass">الفصل</label><select class="input" id="doneClass" required></select></div>
+              <div class="field" style="flex:2 1 280px"><label for="doneLesson">الدرس</label><select class="input" id="doneLesson" required></select></div>
+              <div class="field"><label for="doneDate">التاريخ</label><input class="input" type="date" id="doneDate" required></div>
+              <button class="btn" type="submit">✔ تسجيل</button>
+            </form>
+            <ul class="done-list" id="doneList"></ul>
+          </div>
+        </section>
+
+        <!-- ٤) الإحصائيات -->
+        <section class="tab-section" id="tab-stats">
+          <div class="panel">
+            <h2>📊 إحصائيات سريعة</h2>
+            <p class="sub">تتحدث تلقائيًا مع كل تعديل.</p>
+            <div class="kpis" id="kpis"></div>
+            <div class="top-list" id="topList"></div>
+          </div>
+        </section>
+
+        <!-- ٥) التصدير والنسخ الاحتياطي -->
+        <section class="tab-section" id="tab-backup">
+          <div class="panel">
+            <h2>💾 التصدير والنسخ الاحتياطي</h2>
+            <p class="sub">البيانات محفوظة في هذا المتصفح فقط. احتفظي بنسخة احتياطية بانتظام، خصوصًا قبل تغيير الجهاز.</p>
+            <div class="action-cards">
+              <div class="action-card">
+                <div class="a-ico">📗</div>
+                <h4>تصدير إلى Excel</h4>
+                <p>ملف ‎.xlsx‎ فيه ورقة لبيانات المعلمة، وورقة لكل فصل، وورقة للدروس المنجزة. بدون إنترنت يُصدَّر ملف CSV يفتح في Excel.</p>
+                <button class="btn ok" type="button" id="btnExcel">📗 تصدير إلى Excel</button>
+              </div>
+              <div class="action-card">
+                <div class="a-ico">💾</div>
+                <h4>نسخة احتياطية</h4>
+                <p>تنزيل جميع البيانات في ملف JSON واحد لحفظه أو نقله إلى جهاز آخر.</p>
+                <button class="btn" type="button" id="btnBackup">💾 تنزيل نسخة احتياطية</button>
+              </div>
+              <div class="action-card">
+                <div class="a-ico">📂</div>
+                <h4>استعادة</h4>
+                <p>رفع ملف النسخة الاحتياطية لإرجاع البيانات. ستُستبدل البيانات الحالية.</p>
+                <button class="btn ghost" type="button" id="btnRestore">📂 استعادة من ملف</button>
+                <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+              </div>
+              <div class="action-card danger-zone">
+                <div class="a-ico">🗑️</div>
+                <h4>مسح جميع البيانات</h4>
+                <p>حذف بيانات المعلمة والفصول والطالبات والدروس المنجزة من هذا المتصفح نهائيًا.</p>
+                <button class="btn danger" type="button" id="btnClear">🗑️ مسح جميع البيانات</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة التأكيد داخل الصفحة (بدلًا من alert) -->
+  <div class="modal-back" id="confirmBack" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-icon" id="confirmIcon">⚠️</div>
+      <h3 id="confirmTitle">تأكيد</h3>
+      <p id="confirmText"></p>
+      <div class="modal-actions">
+        <button class="btn danger" type="button" id="confirmYes">نعم</button>
+        <button class="btn ghost" type="button" id="confirmNo">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مكتبة SheetJS لإنشاء ملفات Excel (إذا لم تتوفر يُصدَّر CSV) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="data/lessons.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

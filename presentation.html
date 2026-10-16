@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>العرض التفاعلي — التقنية الرقمية ٢</title>
+  <!-- الخط العربي (يُستخدم خط النظام تلقائيًا إذا لم يتوفر الإنترنت) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="pres">
+
+  <!-- المسرح: تُرسم فيه الشريحة الحالية -->
+  <div id="viewport"><div id="stage" aria-live="polite"></div></div>
+
+  <!-- شريط التقدم -->
+  <div id="progress"><i></i></div>
+
+  <!-- مؤشر الاختصارات -->
+  <div id="hint">Space = التالي | ← → للتنقل | ت = تصفيق | ق = قرعة | F = ملء الشاشة</div>
+
+  <!-- شريط التحكم -->
+  <nav id="controls" aria-label="التحكم في العرض">
+    <button id="btnPrev" type="button" title="السابق (←)">← السابق</button>
+    <span class="counter-label" id="counter">1 / 1</span>
+    <button id="btnNext" type="button" title="التالي (→ أو Space)">التالي →</button>
+    <span class="sep"></span>
+    <button id="btnClap" type="button" title="تصفيق (ت)">👏 تصفيق</button>
+    <button id="btnPick" type="button" title="قرعة الأسماء (ق)">🎲 قرعة</button>
+    <button id="btnFull" type="button" title="ملء الشاشة (F)">⛶</button>
+    <button id="btnHome" type="button" title="مكتبة الدروس (Esc)">🏠 الرئيسية</button>
+  </nav>
+
+  <!-- نافذة قرعة الأسماء -->
+  <div class="picker-back" id="picker" role="dialog" aria-modal="true" aria-label="قرعة الأسماء">
+    <div class="picker-box">
+      <button class="icon-btn pk-close" id="pkClose" type="button" title="إغلاق (Esc)">✕</button>
+      <p class="pk-title">🎲 قرعة الأسماء</p>
+      <div class="pk-class" id="pkClass"></div>
+      <div class="pk-name" id="pkName">🎲</div>
+      <div class="pk-actions">
+        <button class="btn gold" id="pkDraw" type="button">🎲 اسحبي اسمًا</button>
+        <button class="btn" id="pkPoint" type="button" disabled>+١ نقطة</button>
+        <button class="btn ok" id="pkCorrect" type="button" disabled>إجابة صحيحة ✓</button>
+        <button class="btn ghost" id="pkReset" type="button" title="تبدأ جولة جديدة يمكن فيها اختيار جميع الطالبات">🔄 إعادة البدء</button>
+      </div>
+      <div class="pk-result" id="pkResult"></div>
+      <div class="pk-stats" id="pkStats"></div>
+    </div>
+  </div>
+
+  <!-- طبقة المؤثرات (تصفيق واحتفال) -->
+  <div id="fx" aria-hidden="true"></div>
+
+  <script src="data/lessons.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

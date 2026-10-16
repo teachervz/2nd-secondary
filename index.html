@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مكتبة الدروس — التقنية الرقمية ٢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+
+    <!-- الشريط العلوي -->
+    <header class="topbar">
+      <a class="brand" href="index.html">
+        <span class="logo">💻</span>
+        <span>عروض التقنية الرقمية ٢<small id="bookLine">الصف الثاني الثانوي — نظام المسارات</small></span>
+      </a>
+      <a class="btn ghost" href="dashboard.html">⚙️ لوحة تحكم المعلمة</a>
+    </header>
+
+    <!-- الترحيب واختيار الفصل -->
+    <section class="hero">
+      <div style="position:relative;z-index:1">
+        <h1 id="welcome">أهلًا بكِ في مكتبة الدروس التفاعلية 💜</h1>
+        <p id="welcomeSub">اختاري الفصل، ثم ابدئي عرض أي درس بضغطة واحدة.</p>
+        <div class="hero-meta" id="heroMeta"></div>
+      </div>
+      <div class="class-box">
+        <label for="classSelect">👩‍🎓 اختاري الفصل قبل بدء العرض</label>
+        <select id="classSelect" class="input"></select>
+        <div class="hint" id="classHint"></div>
+      </div>
+    </section>
+
+    <!-- إحصائيات سريعة -->
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- الوحدات والدروس -->
+    <main id="units"></main>
+
+    <p class="footer-note">تُحفظ البيانات في هذا المتصفح فقط — استخدمي «نسخة احتياطية» من لوحة التحكم عند تغيير الجهاز.</p>
+  </div>
+
+  <script src="data/lessons.js"></script>
+  <script src="js/storage.js"></script>
+  <script>
+    /* =========================================================
+       منطق الصفحة الرئيسية (مكتبة الدروس)
+       ========================================================= */
+    (function () {
+      'use strict';
+      const data = window.LESSONS_DATA || { units: [] };
+      const st = Store.get();
+      const t = st.teacher;
+      const $ = function (id) { return document.getElementById(id); };
+      const esc = function (s) {
+        return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      };
+      const arNum = function (n) { return String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }); };
+
+      /* الترحيب باسم المعلمة والمدرسة */
+      if (t.name) $('welcome').textContent = 'أهلًا بكِ يا أ. ' + t.name + ' 💜';
+      const meta = [];
+      if (t.school) meta.push('🏫 ' + t.school);
+      if (t.subject) meta.push('📘 ' + t.subject);
+      if (t.grade) meta.push('🎓 ' + t.grade);
+      if (t.term) meta.push('🗓️ ' + t.term);
+      if (t.year) meta.push('📅 ' + t.year);
+      $('heroMeta').innerHTML = meta.map(function (m) { return '<span class="pill">' + esc(m) + '</span>'; }).join('');
+      if (!t.name) $('welcomeSub').innerHTML = 'ابدئي بإدخال بياناتك وفصولك من <a href="dashboard.html" style="color:#fde68a;font-weight:800">لوحة التحكم</a>، ثم اختاري الفصل وابدئي العرض.';
+
+      /* قائمة الفصول */
+      const sel = $('classSelect');
+      function fillClasses() {
+        sel.innerHTML = '';
+        if (!st.classes.length) {
+          sel.appendChild(new Option('— لا توجد فصول بعد —', ''));
+          sel.disabled = true;
+          $('classHint').innerHTML = 'أضيفي الفصول وأسماء الطالبات من <a href="dashboard.html">لوحة التحكم</a> لتعمل القرعة والنقاط.';
+          return;
+        }
+        sel.disabled = false;
+        st.classes.forEach(function (c) {
+          sel.appendChild(new Option(c.name + ' (' + arNum(c.students.length) + ' طالبة)', c.id));
+        });
+        if (!Store.getClass(st.currentClassId)) Store.update(function (d) { d.currentClassId = d.classes[0].id; }, true);
+        sel.value = st.currentClassId;
+        $('classHint').textContent = 'تُستخدم أسماء طالبات هذا الفصل في القرعة والنقاط، وتظهر ✔️ على الدروس المنجزة له.';
+      }
+      sel.addEventListener('change', function () {
+        Store.update(function (d) { d.currentClassId = sel.value; }, true);
+        renderUnits();
+      });
+
+      /* الإحصائيات السريعة */
+      function renderStats() {
+        const total = data.units.reduce(function (n, u) { return n + u.lessons.length; }, 0);
+        const doneHere = st.currentClassId ? st.completed.filter(function (x) { return x.classId === st.currentClassId; }).length : 0;
+        const students = st.classes.reduce(function (n, c) { return n + c.students.length; }, 0);
+        const chips = [
+          ['📚', arNum(data.units.length), 'وحدات'],
+          ['🎬', arNum(total), 'درسًا تفاعليًا'],
+          ['✔️', arNum(doneHere), 'دروس منجزة للفصل المختار'],
+          ['👩‍🎓', arNum(students), 'طالبة في جميع الفصول']
+        ];
+        $('statsRow').innerHTML = chips.map(function (c) {
+          return '<div class="stat-chip"><span class="ico">' + c[0] + '</span><div><b>' + c[1] + '</b><span>' + c[2] + '</span></div></div>';
+        }).join('');
+      }
+
+      /* بطاقات الوحدات والدروس */
+      function renderUnits() {
+        const wrap = $('units');
+        wrap.innerHTML = '';
+        const cid = st.currentClassId;
+        data.units.forEach(function (u, ui) {
+          const done = u.lessons.filter(function (l) { return cid && Store.isCompleted(cid, l.id); }).length;
+          const block = document.createElement('section');
+          block.className = 'unit-block theme-' + (u.theme || u.id);   // ثيم الوحدة
+          block.innerHTML =
+            '<div class="unit-head">' +
+              '<div class="unit-num">' + esc(u.icon || '📘') + '</div>' +
+              '<div><h2>' + esc(u.title) + (u.themeName ? ' <span class="theme-pill">' + esc(u.themeName) + '</span>' : '') + '</h2><p>' + esc(u.subtitle || '') + '</p></div>' +
+              '<div class="unit-progress">' + (cid ? arNum(done) + ' / ' + arNum(u.lessons.length) + ' منجزة' : arNum(u.lessons.length) + ' دروس') + '</div>' +
+            '</div>';
+          const grid = document.createElement('div');
+          grid.className = 'lessons-grid';
+          u.lessons.forEach(function (l, li) {
+            const isDone = cid && Store.isCompleted(cid, l.id);
+            const url = 'presentation.html?lesson=' + encodeURIComponent(l.id) + (cid ? '&class=' + encodeURIComponent(cid) : '');
+            const card = document.createElement('article');
+            card.className = 'lesson-card' + (isDone ? ' done' : '');
+            card.innerHTML =
+              (isDone ? '<span class="done-badge">✔️ تم شرحه</span>' : '') +
+              '<div class="l-num">الدرس ' + arNum(li + 1) + '</div>' +
+              '<h3>' + esc(l.title) + '</h3>' +
+              '<div class="l-meta"><span>📄 صفحة ' + arNum(l.page) + '</span><span>🎞️ ' + arNum((l.slides || []).length) + ' شريحة</span></div>' +
+              '<a class="btn" href="' + url + '">▶ ابدئي العرض</a>';
+            grid.appendChild(card);
+          });
+          block.appendChild(grid);
+          wrap.appendChild(block);
+        });
+        renderStats();
+      }
+
+      fillClasses();
+      renderUnits();
+    })();
+  </script>
+</body>
+</html>
